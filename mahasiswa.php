@@ -22,8 +22,7 @@ switch ($request_method) {
       {
          $mhs->get_mhss();
       }
-      //stop
-      break;
+   break;
 
    //apabila method yang digunakan POST
    case 'POST':
@@ -31,7 +30,7 @@ switch ($request_method) {
       if(!empty($_GET["id"]))
       {
          $id=$_GET["id"];
-         $mhs->update_user($id);
+         // $mhs->update_user($id);
          $mhs->update_mhs($id);
       }
       //jika tidak ada parameter, maka jalankan function insert untuk mengisi data baru di tabel user dan tabel mahasiswa. isikan data yang baru di form-data
@@ -40,25 +39,25 @@ switch ($request_method) {
          $mhs->insert_user();
          $mhs->insert_mhs();
       }
-      //stop
-      break;
+   break;
+
+   case 'PUT':
+      $id=$_GET["id"];
+      $mhs->update_user($id);
+      $mhs->update_mhs($id);
+   break;
 
    //apabila method yang digunakan DELETE, maka jalankan function delete untuk menghapus data yang ada di tabel user dan tabel mahasiswa berdasarkan parameter yang masuk yaitu id
    case 'DELETE':
       $id= $_GET["id"];
       $mhs->delete_user($id);
-      $mhs->delete_mhs($id);
-      //stop
       break;
    
    //case yang akan berjalan apabila tidak ada case yang cocok
    default:
    // Invalid Request Method
       header("HTTP/1.0 405 Method Not Allowed");
-      //stop
       break;
-   
-   //stop
    break;
 }
 ?>

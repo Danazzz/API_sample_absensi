@@ -2,71 +2,54 @@
 require_once "config/database.php";
 require_once "config/function.php";
 
-$user = $_POST['user'];
+//function upload gambar dan validasi gambar
+function upload(){
+    $data = json_decode(file_get_contents("php://input"), true);
 
-$allowedExts = array("gif", "jpeg", "jpg", "png");
-$temp = explode(".", $_FILES["file"]["name"]);
-$extension = end($temp);
+    $namaFile = $_FILES['gambar']['name'];
+    $ukuranFile = $_FILES['gambar']['size'];
+    $error = $_FILES['gambar']['error'];
+    $tmpName = $_FILES['gambar']['tmp_name'];
+    $formatGambar = ['jpg','jpeg','png'];
+    $format = explode('.', $namaFile);
+    $format = strtolower(end($format));
+    $namaFileBaru = uniqid();
+    $namaFileBaru .= '.';
+    $namaFileBaru .= $format;
+    $upload_path = 'upload/';
 
-if ((($_FILES["file"]["type"] == "image/gif")
-|| ($_FILES["file"]["type"] == "image/jpeg")
-|| ($_FILES["file"]["type"] == "image/jpg")
-|| ($_FILES["file"]["type"] == "image/pjpeg")
-|| ($_FILES["file"]["type"] == "image/x-png")
-|| ($_FILES["file"]["type"] == "image/png"))
-&& in_array($extension, $allowedExts)) {
+    if(empty($namaFile) AND $error === 4){
+        $errorMSG = json_encode(array("message" => "please select image", "status" => false));	
+        echo $errorMSG;
+    } else {
+        // allow valid image file formats
+        if(in_array($format, $formatGambar)){				
+            //check file not exist our upload folder path
+            if(!file_exists($upload_path . $namaFile)){
+                // check file size '5MB'
+                if($ukuranFile < 5000000){
+                    move_uploaded_file($tmpName, $upload_path . $namaFileBaru); // move file from system temporary path to our upload folder path 
+                } else {		
+                    $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => false));	
+                    echo $errorMSG;
+                }
+            } else {
+                $errorMSG = json_encode(array("message" => "Sorry, file already exists check upload folder", "status" => false));	
+                echo $errorMSG;
+            }
+        } else {		
+            $errorMSG = json_encode(array("message" => "Sorry, only JPG, JPEG, PNG & GIF files are allowed", "status" => false));	
+            echo $errorMSG;		
+        }
+    }
 
-  if ($_FILES["file"]["error"] > 0) {
-
-    echo "Error: " . $_FILES["file"]["error"] . "<br>";
-
-  } else {
-
-    //Move the file to the uploads folder
-    move_uploaded_file($_FILES["file"]["tmp_name"], "uploads/" . $_FILES["file"]["name"]);
-
-    //Get the File Location
-    $filelocation = 'http://yourdomain.com/uploads/'.$_FILES["file"]["name"];
-
-    //Get the File Size
-    $size = ($_FILES["file"]["size"]/1024).' kB';
-
-    //Save to your Database
-    mysqli_query($connect_to_db, "INSERT INTO images (user, filelocation, size) VALUES ('$user', '$filelocation', '$size')");
-
-    //Redirect to the confirmation page, and include the file location in the URL
-    header('Location: confirm.php?location='.$filelocation);
-  }
-} else {
-  //File type was invalid, so throw up a red flag!
-  echo "Invalid File Type";
+    // if no error caused, continue ....
+    if(!isset($errorMSG)){
+        return $namaFileBaru;
+    }
 }
 
-   //function upload gambar dan validasi gambar
-function upload(){
-  $namaFile = $_FILES['gambar']['name'];
-  $ukuranFIle = $_FILES['gambar']['size'];
-  $error = $_FILES['gambar']['error'];
-  $tmpName = $_FILES['gambar']['tmp_name'];
-  $formatGambar = ['jpg','jpeg','png'];
-  $format = explode('.', $namaFile);
-  $format = strtolower(end($format));
-  if($error === 4){
-      echo "<script>alert ('Gambar tidak ada!')</script>";
-      return false;
-  }
-  if(!in_array($format,$formatGambar)){
-      echo "<script>alert ('yang anda upload bukan gambar!')</script>";
-      return false;
-  }
-  if($ukuranFIle > 10000000){
-      echo "<script>alert ('Ukuran terlalu besar!')</script>";
-      return false;
-  }
-  $namafilebaru = uniqid();
-  $namafilebaru .= '.';
-  $namafilebaru .= $format; 
-  move_uploaded_file($tmpName,'upload/' . $namafilebaru);
-  return $namafilebaru;
+function update_file(){
+
 }
 ?>
