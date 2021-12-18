@@ -1,5 +1,5 @@
 <?php
-require_once "config/function.php";
+require_once "config/function_copy.php";
 
 //deklarasi variabel mhs untuk menampung kelas mahasiswa di function.php
 $mhs = new Mahasiswa();
@@ -30,21 +30,21 @@ switch ($request_method) {
       if(!empty($_GET["id"]))
       {
          $id=$_GET["id"];
-         // $mhs->update_user($id);
-         $mhs->update_mhs($id);
+         $mhs->update_user($id);
+         // $mhs->update_mhs($id);
       }
       //jika tidak ada parameter, maka jalankan function insert untuk mengisi data baru di tabel user dan tabel mahasiswa. isikan data yang baru di form-data
       else
       {
          $mhs->insert_user();
-         $mhs->insert_mhs();
+         // $mhs->insert_mhs();
       }
    break;
 
    case 'PUT':
       $id=$_GET["id"];
       $mhs->update_user($id);
-      $mhs->update_mhs($id);
+      // $mhs->update_mhs($id);
    break;
 
    //apabila method yang digunakan DELETE, maka jalankan function delete untuk menghapus data yang ada di tabel user dan tabel mahasiswa berdasarkan parameter yang masuk yaitu id
